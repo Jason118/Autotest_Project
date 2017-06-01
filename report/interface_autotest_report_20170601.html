@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>Test Report</title>
+    <link href="assets/style.css" rel="stylesheet" type="text/css"/></head>
+  <body onLoad="init()">
+    <script>/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+
+function toArray(iter) {
+    if (iter === null) {
+        return null;
+    }
+    return Array.prototype.slice.call(iter);
+}
+
+function find(selector, elem) {
+    if (!elem) {
+        elem = document;
+    }
+    return elem.querySelector(selector);
+}
+
+function find_all(selector, elem) {
+    if (!elem) {
+        elem = document;
+    }
+    return toArray(elem.querySelectorAll(selector));
+}
+
+function sort_column(elem) {
+    toggle_sort_states(elem);
+    var colIndex = toArray(elem.parentNode.childNodes).indexOf(elem);
+    var key;
+    if (elem.classList.contains('numeric')) {
+        key = key_num;
+    } else if (elem.classList.contains('result')) {
+        key = key_result;
+    } else {
+        key = key_alpha;
+    }
+    sort_table(elem, key(colIndex));
+}
+
+function show_all_extras() {
+    find_all('.col-result').forEach(show_extras);
+}
+
+function hide_all_extras() {
+    find_all('.col-result').forEach(hide_extras);
+}
+
+function show_extras(colresult_elem) {
+    var extras = colresult_elem.parentNode.nextElementSibling;
+    var expandcollapse = colresult_elem.firstElementChild;
+    extras.classList.remove("collapsed");
+    expandcollapse.classList.remove("expander");
+    expandcollapse.classList.add("collapser");
+}
+
+function hide_extras(colresult_elem) {
+    var extras = colresult_elem.parentNode.nextElementSibling;
+    var expandcollapse = colresult_elem.firstElementChild;
+    extras.classList.add("collapsed");
+    expandcollapse.classList.remove("collapser");
+    expandcollapse.classList.add("expander");
+}
+
+function show_filters() {
+    var filter_items = document.getElementsByClassName('filter');
+    for (var i = 0; i < filter_items.length; i++)
+        filter_items[i].hidden = false;
+}
+
+function add_collapse() {
+    // Add links for show/hide all
+    var resulttable = find('table#results-table');
+    var showhideall = document.createElement("p");
+    showhideall.innerHTML = '<a href="javascript:show_all_extras()">Show all details</a> / ' +
+                            '<a href="javascript:hide_all_extras()">Hide all details</a>';
+    resulttable.parentElement.insertBefore(showhideall, resulttable);
+
+    // Add show/hide link to each result
+    find_all('.col-result').forEach(function(elem) {
+        var extras = elem.parentNode.nextElementSibling;
+        var expandcollapse = document.createElement("span");
+        if (elem.innerHTML === 'Passed') {
+            extras.classList.add("collapsed");
+            expandcollapse.classList.add("expander");
+        } else {
+            expandcollapse.classList.add("collapser");
+        }
+        elem.appendChild(expandcollapse);
+
+        elem.addEventListener("click", function(event) {
+            if (event.currentTarget.parentNode.nextElementSibling.classList.contains("collapsed")) {
+                show_extras(event.currentTarget);
+            } else {
+                hide_extras(event.currentTarget);
+            }
+        });
+    })
+}
+
+function init () {
+    reset_sort_headers();
+
+    add_collapse();
+
+    show_filters();
+
+    toggle_sort_states(find('.initial-sort'));
+
+    find_all('.sortable').forEach(function(elem) {
+        elem.addEventListener("click",
+                              function(event) {
+                                  sort_column(elem);
+                              }, false)
+    });
+
+};
+
+function sort_table(clicked, key_func) {
+    var rows = find_all('.results-table-row');
+    var reversed = !clicked.classList.contains('asc');
+    var sorted_rows = sort(rows, key_func, reversed);
+    /* Whole table is removed here because browsers acts much slower
+     * when appending existing elements.
+     */
+    var thead = document.getElementById("results-table-head");
+    document.getElementById('results-table').remove();
+    var parent = document.createElement("table");
+    parent.id = "results-table";
+    parent.appendChild(thead);
+    sorted_rows.forEach(function(elem) {
+        parent.appendChild(elem);
+    });
+    document.getElementsByTagName("BODY")[0].appendChild(parent);
+}
+
+function sort(items, key_func, reversed) {
+    var sort_array = items.map(function(item, i) {
+        return [key_func(item), i];
+    });
+    var multiplier = reversed ? -1 : 1;
+
+    sort_array.sort(function(a, b) {
+        var key_a = a[0];
+        var key_b = b[0];
+        return multiplier * (key_a >= key_b ? 1 : -1);
+    });
+
+    return sort_array.map(function(item) {
+        var index = item[1];
+        return items[index];
+    });
+}
+
+function key_alpha(col_index) {
+    return function(elem) {
+        return elem.childNodes[1].childNodes[col_index].firstChild.data.toLowerCase();
+    };
+}
+
+function key_num(col_index) {
+    return function(elem) {
+        return parseFloat(elem.childNodes[1].childNodes[col_index].firstChild.data);
+    };
+}
+
+function key_result(col_index) {
+    return function(elem) {
+        var strings = ['Error', 'Failed', 'Rerun', 'XFailed', 'XPassed',
+                       'Skipped', 'Passed'];
+        return strings.indexOf(elem.childNodes[1].childNodes[col_index].firstChild.data);
+    };
+}
+
+function reset_sort_headers() {
+    find_all('.sort-icon').forEach(function(elem) {
+        elem.parentNode.removeChild(elem);
+    });
+    find_all('.sortable').forEach(function(elem) {
+        var icon = document.createElement("div");
+        icon.className = "sort-icon";
+        icon.textContent = "vvv";
+        elem.insertBefore(icon, elem.firstChild);
+        elem.classList.remove("desc", "active");
+        elem.classList.add("asc", "inactive");
+    });
+}
+
+function toggle_sort_states(elem) {
+    //if active, toggle between asc and desc
+    if (elem.classList.contains('active')) {
+        elem.classList.toggle('asc');
+        elem.classList.toggle('desc');
+    }
+
+    //if inactive, reset all other functions and add ascending active
+    if (elem.classList.contains('inactive')) {
+        reset_sort_headers();
+        elem.classList.remove('inactive');
+        elem.classList.add('active');
+    }
+}
+
+function is_all_rows_hidden(value) {
+  return value.hidden == false;
+}
+
+function filter_table(elem) {
+    var outcome_att = "data-test-result";
+    var outcome = elem.getAttribute(outcome_att);
+    class_outcome = outcome + " results-table-row";
+    var outcome_rows = document.getElementsByClassName(class_outcome);
+
+    for(var i = 0; i < outcome_rows.length; i++){
+        outcome_rows[i].hidden = !elem.checked;
+    }
+
+    var rows = find_all('.results-table-row').filter(is_all_rows_hidden);
+    var all_rows_hidden = rows.length == 0 ? true : false;
+    var not_found_message = document.getElementById("not-found-message");
+    not_found_message.hidden = !all_rows_hidden;
+}
+</script>
+    <p>Report generated on 01-Jun-2017 at 14:47:53 by<a href="https://pypi.python.org/pypi/pytest-html"> pytest-html</a> v1.14.2</p>
+    <h2>Environment</h2>
+    <table id="environment">
+      <tr>
+        <td>Packages</td>
+        <td>{&apos;py&apos;: &apos;1.4.33&apos;, &apos;pytest&apos;: &apos;3.1.0&apos;, &apos;pluggy&apos;: &apos;0.4.0&apos;}</td></tr>
+      <tr>
+        <td>Platform</td>
+        <td>Darwin-16.5.0-x86_64-i386-64bit</td></tr>
+      <tr>
+        <td>Plugins</td>
+        <td>{&apos;html&apos;: &apos;1.14.2&apos;, &apos;metadata&apos;: &apos;1.5.0&apos;}</td></tr>
+      <tr>
+        <td>Python</td>
+        <td>2.7.13</td></tr></table>
+    <h2>Summary</h2>
+    <p>22 tests ran in 11.40 seconds. </p>
+    <p class="filter" hidden="true">(Un)check the boxes to filter the results.</p><input checked="true" class="filter" data-test-result="passed" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="passed">19 passed</span>, <input checked="true" class="filter" data-test-result="skipped" disabled="true" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="skipped">0 skipped</span>, <input checked="true" class="filter" data-test-result="failed" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="failed">3 failed</span>, <input checked="true" class="filter" data-test-result="error" disabled="true" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="error">0 errors</span>, <input checked="true" class="filter" data-test-result="xfailed" disabled="true" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="xfailed">0 expected failures</span>, <input checked="true" class="filter" data-test-result="xpassed" disabled="true" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="xpassed">0 unexpected passes</span>
+    <h2>Results</h2>
+    <table id="results-table">
+      <thead id="results-table-head">
+        <tr>
+          <th class="sortable result initial-sort" col="result">Result</th>
+          <th class="sortable" col="name">Test</th>
+          <th class="sortable numeric" col="duration">Duration</th>
+          <th>Links</th></tr>
+        <tr hidden="true" id="not-found-message">
+          <th colspan="4">No results found. Try to check the filters</th></tr></thead>
+      <tbody class="failed results-table-row">
+        <tr>
+          <td class="col-result">Failed</td>
+          <td class="col-name">test_http.py::test_post[OpenResultList-{&quot;iGameId&quot;:51,&quot;sGamePeriod&quot;:20170524173}-{&quot;SQL&quot;:&quot;SELECT *, isnull((fBonusMoney - fBetMoney  + fRewardMoney),0) AS fUserBalance,isnull((fBetMoney - fBonusMoney),0) AS fCorpBalance FROM (SELECT * FROM (SELECT isnull(SUM (famount),0) AS fBetMoney,isnull(SUM (fRewardMoney),0) AS fRewardMoney,isnull(SUM (fWinAmount),0) AS fBonusMoney FROM tbet WHERE iGameId = 51 AND sGamePeriod = 20170524173 and iStatus &lt;&gt; 2 ) AS T1 INNER JOIN (SELECT isnull(SUM (famount),0) AS fRefundMoney FROM tbet WHERE iGameId = 51 AND sGamePeriod=20170524173 AND istatus = 2) AS T2  ON 1 = 1) AS T3 RIGHT JOIN (select dOpenTime as dOpenTimeTEXT, iGameId, sGamePeriod, sOpenNum from tgameperiod where sGamePeriod=20170524173 and iGameId=51) as t5 on 1=1;&quot;}]</td>
+          <td class="col-duration">0.75</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">interfaceID = 'OpenResultList'<br/>data = '{"iGameId":51,"sGamePeriod":20170524173}'<br/>expResult = {'SQL': 'SELECT *, isnull((fBonusMoney - fBetMoney  + fRewardMoney),0) AS fUserBalance,isnull((fBetMoney - fBonusMoney...TimeTEXT, iGameId, sGamePeriod, sOpenNum from tgameperiod where sGamePeriod=20170524173 and iGameId=51) as t5 on 1=1;'}<br/><br/>    @pytest.mark.parametrize("interfaceID,data,expResult",sql_query(db_mysql_connect(),sql))<br/>    # @pytest.fixture(params=bb)<br/>    def test_post(interfaceID, data,expResult):<br/>        response=HTTPClient().send(interfaceID,data=data)<br/>        # print 'response',response<br/>    <br/>        #断言<br/>        assert {} != json.loads(response.decode('raw_unicode_escape'))<br/>        expResult = ast.literal_eval(expResult)<br/>        if 'SQL' in expResult:<br/>            expResult_list = sql_query_dict_one(db_sqlserver_connect(), expResult['SQL'])<br/>            if "Records" in json.loads(response.decode('raw_unicode_escape')):<br/>                for i in range(len(expResult_list)):<br/>    <br/>                    # print 'ex_result:', expResult_list[i]<br/>                    # print 'act_result:', json.loads(response.decode('raw_unicode_escape'))['Records'][i]<br/>                    # assert set(expResult_list[i].items()).issubset(set(json.loads(response.decode('raw_unicode_escape'))['Records'][i].items()))<br/>&gt;                   assertDictContainsSubset(expResult_list[i], json.loads(response.decode('raw_unicode_escape'))['Records'][i],'haha1两者不匹配1：')<br/><br/>test_http.py:40: <br/>_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ <br/><br/>expected = {'dOpenTimeTEXT': '2017-05-24 17:39:00', 'fBetMoney': 0.0, 'fBonusMoney': 0.0, 'fCorpBalance': 0.0, ...}<br/>actual = {'dOpenTime': 42879.7354166667, 'dOpenTimeTEXT': '2017-05-24 17:39:00', 'fBetMoney': 0, 'fBonusMoney': 0, ...}<br/>msg = 'haha1\xe4\xb8\xa4\xe8\x80\x85\xe4\xb8\x8d\xe5\x8c\xb9\xe9\x85\x8d1\xef\xbc\x9a'<br/><br/>    def assertDictContainsSubset(expected, actual, msg=None):<br/>        """Checks whether actual is a superset of expected."""<br/>        missing = []<br/>        mismatched = []<br/>        for key, value in expected.iteritems():<br/>            if key not in actual:<br/>                missing.append(key)<br/>            elif value != actual[key]:<br/>                mismatched.append('%s, expected: %s, actual: %s' % (key, value,actual[key]))<br/>    <br/>        if not (missing or mismatched):<br/>            return<br/>    <br/>        standardMsg = ''<br/>        if missing:<br/>            standardMsg = 'Missing: %s' % ','.join(m for m in missing)<br/>        if mismatched:<br/>            if standardMsg:<br/>                standardMsg += '; '<br/>            standardMsg += 'Mismatched values: %s' % ','.join(mismatched)<br/>    <br/>        if msg is None:<br/>            raise Exception(standardMsg)<br/>        else:<br/>            try:<br/>            # don't switch to '{}' formatting in Python 2.X<br/>            # it changes the way unicode input is handled<br/>&gt;               raise Exception('%s : %s' % (standardMsg, msg))<br/><span class="error">E               Exception: Mismatched values: fRefundMoney, expected: 2.0, actual: 0 : haha1两者不匹配1：</span><br/><br/>../../../utils/assert_extra.py:35: Exception<br/></div></td></tr></tbody>
+      <tbody class="failed results-table-row">
+        <tr>
+          <td class="col-result">Failed</td>
+          <td class="col-name">test_http.py::test_post[OpenResultList-{&quot;iGameId&quot;:51,&quot;sGamePeriod&quot;:20170525095}-{&quot;SQL&quot;:&quot;SELECT *, isnull((fBonusMoney - fBetMoney  + fRewardMoney),0) AS fUserBalance,isnull((fBetMoney - fBonusMoney),0) AS fCorpBalance FROM  (SELECT * FROM ( SELECT isnull(SUM (famount),0) AS fBetMoney,isnull(SUM (fRewardMoney),0) AS fRewardMoney,isnull(SUM (fWinAmount),0) AS fBonusMoney FROM tbet WHERE iGameId = 51 AND sGamePeriod = 20170525095 and iStatus &lt;&gt; 2 ) AS T1 INNER JOIN (SELECT isnull(SUM (famount),0) AS fRefundMoney FROM tbet WHERE iGameId = 51 AND sGamePeriod=20170525095 AND istatus = 2) AS T2  ON 1 = 1) AS T3 RIGHT JOIN (select dOpenTime as dOpenTimeTEXT, iGameId, sGamePeriod, sOpenNum from tgameperiod where sGamePeriod=20170525095 and iGameId=51) as t5 on 1=1;&quot;}]</td>
+          <td class="col-duration">0.75</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">interfaceID = 'OpenResultList'<br/>data = '{"iGameId":51,"sGamePeriod":20170525095}'<br/>expResult = {'SQL': 'SELECT *, isnull((fBonusMoney - fBetMoney  + fRewardMoney),0) AS fUserBalance,isnull((fBetMoney - fBonusMoney...TimeTEXT, iGameId, sGamePeriod, sOpenNum from tgameperiod where sGamePeriod=20170525095 and iGameId=51) as t5 on 1=1;'}<br/><br/>    @pytest.mark.parametrize("interfaceID,data,expResult",sql_query(db_mysql_connect(),sql))<br/>    # @pytest.fixture(params=bb)<br/>    def test_post(interfaceID, data,expResult):<br/>        response=HTTPClient().send(interfaceID,data=data)<br/>        # print 'response',response<br/>    <br/>        #断言<br/>        assert {} != json.loads(response.decode('raw_unicode_escape'))<br/>        expResult = ast.literal_eval(expResult)<br/>        if 'SQL' in expResult:<br/>            expResult_list = sql_query_dict_one(db_sqlserver_connect(), expResult['SQL'])<br/>            if "Records" in json.loads(response.decode('raw_unicode_escape')):<br/>                for i in range(len(expResult_list)):<br/>    <br/>                    # print 'ex_result:', expResult_list[i]<br/>                    # print 'act_result:', json.loads(response.decode('raw_unicode_escape'))['Records'][i]<br/>                    # assert set(expResult_list[i].items()).issubset(set(json.loads(response.decode('raw_unicode_escape'))['Records'][i].items()))<br/>&gt;                   assertDictContainsSubset(expResult_list[i], json.loads(response.decode('raw_unicode_escape'))['Records'][i],'haha1两者不匹配1：')<br/><br/>test_http.py:40: <br/>_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ <br/><br/>expected = {'dOpenTimeTEXT': '2017-05-25 13:45:00', 'fBetMoney': 0.0, 'fBonusMoney': 0.0, 'fCorpBalance': 0.0, ...}<br/>actual = {'dOpenTime': 42880.5729166667, 'dOpenTimeTEXT': '2017-05-25 13:45:00', 'fBetMoney': 0, 'fBonusMoney': 0, ...}<br/>msg = 'haha1\xe4\xb8\xa4\xe8\x80\x85\xe4\xb8\x8d\xe5\x8c\xb9\xe9\x85\x8d1\xef\xbc\x9a'<br/><br/>    def assertDictContainsSubset(expected, actual, msg=None):<br/>        """Checks whether actual is a superset of expected."""<br/>        missing = []<br/>        mismatched = []<br/>        for key, value in expected.iteritems():<br/>            if key not in actual:<br/>                missing.append(key)<br/>            elif value != actual[key]:<br/>                mismatched.append('%s, expected: %s, actual: %s' % (key, value,actual[key]))<br/>    <br/>        if not (missing or mismatched):<br/>            return<br/>    <br/>        standardMsg = ''<br/>        if missing:<br/>            standardMsg = 'Missing: %s' % ','.join(m for m in missing)<br/>        if mismatched:<br/>            if standardMsg:<br/>                standardMsg += '; '<br/>            standardMsg += 'Mismatched values: %s' % ','.join(mismatched)<br/>    <br/>        if msg is None:<br/>            raise Exception(standardMsg)<br/>        else:<br/>            try:<br/>            # don't switch to '{}' formatting in Python 2.X<br/>            # it changes the way unicode input is handled<br/>&gt;               raise Exception('%s : %s' % (standardMsg, msg))<br/><span class="error">E               Exception: Mismatched values: fRefundMoney, expected: 25.0, actual: 0 : haha1两者不匹配1：</span><br/><br/>../../../utils/assert_extra.py:35: Exception<br/></div></td></tr></tbody>
+      <tbody class="failed results-table-row">
+        <tr>
+          <td class="col-result">Failed</td>
+          <td class="col-name">test_http.py::test_post[OpenResultList-{&quot;iGameId&quot;:51,&quot;sGamePeriod&quot;:20170527034}-{&quot;SQL&quot;:&quot;SELECT *, isnull((fBonusMoney - fBetMoney  + fRewardMoney),0) AS fUserBalance,isnull((fBetMoney - fBonusMoney),0) AS fCorpBalance FROM (SELECT * FROM (SELECT isnull(SUM(famount),0) AS fBetMoney,isnull(SUM(fRewardMoney),0) AS fRewardMoney,isnull(SUM(fWinAmount),0) AS fBonusMoney FROM tbet WHERE iGameId = 51 AND sGamePeriod = 20170527034 and iStatus &lt;&gt; 2 ) AS T1 INNER JOIN (SELECT isnull(SUM(famount),0) AS fRefundMoney FROM tbet WHERE iGameId = 51 AND sGamePeriod = 20170527034 AND istatus = 2) AS T2  ON 1 = 1) AS T3 RIGHT JOIN (select dOpenTime as dOpenTimeTEXT, iGameId, sGamePeriod, sOpenNum from tgameperiod where sGamePeriod=20170527034 and iGameId=51) as t5 on 1=1;&quot;}]</td>
+          <td class="col-duration">0.77</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">interfaceID = 'OpenResultList'<br/>data = '{"iGameId":51,"sGamePeriod":20170527034}'<br/>expResult = {'SQL': 'SELECT *, isnull((fBonusMoney - fBetMoney  + fRewardMoney),0) AS fUserBalance,isnull((fBetMoney - fBonusMoney...TimeTEXT, iGameId, sGamePeriod, sOpenNum from tgameperiod where sGamePeriod=20170527034 and iGameId=51) as t5 on 1=1;'}<br/><br/>    @pytest.mark.parametrize("interfaceID,data,expResult",sql_query(db_mysql_connect(),sql))<br/>    # @pytest.fixture(params=bb)<br/>    def test_post(interfaceID, data,expResult):<br/>        response=HTTPClient().send(interfaceID,data=data)<br/>        # print 'response',response<br/>    <br/>        #断言<br/>        assert {} != json.loads(response.decode('raw_unicode_escape'))<br/>        expResult = ast.literal_eval(expResult)<br/>        if 'SQL' in expResult:<br/>            expResult_list = sql_query_dict_one(db_sqlserver_connect(), expResult['SQL'])<br/>            if "Records" in json.loads(response.decode('raw_unicode_escape')):<br/>                for i in range(len(expResult_list)):<br/>    <br/>                    # print 'ex_result:', expResult_list[i]<br/>                    # print 'act_result:', json.loads(response.decode('raw_unicode_escape'))['Records'][i]<br/>                    # assert set(expResult_list[i].items()).issubset(set(json.loads(response.decode('raw_unicode_escape'))['Records'][i].items()))<br/>&gt;                   assertDictContainsSubset(expResult_list[i], json.loads(response.decode('raw_unicode_escape'))['Records'][i],'haha1两者不匹配1：')<br/><br/>test_http.py:40: <br/>_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ <br/><br/>expected = {'dOpenTimeTEXT': '2017-05-27 10:42:00', 'fBetMoney': 0.0, 'fBonusMoney': 0.0, 'fCorpBalance': 0.0, ...}<br/>actual = {'dOpenTime': 42882.4458333333, 'dOpenTimeTEXT': '2017-05-27 10:42:00', 'fBetMoney': 0, 'fBonusMoney': 0, ...}<br/>msg = 'haha1\xe4\xb8\xa4\xe8\x80\x85\xe4\xb8\x8d\xe5\x8c\xb9\xe9\x85\x8d1\xef\xbc\x9a'<br/><br/>    def assertDictContainsSubset(expected, actual, msg=None):<br/>        """Checks whether actual is a superset of expected."""<br/>        missing = []<br/>        mismatched = []<br/>        for key, value in expected.iteritems():<br/>            if key not in actual:<br/>                missing.append(key)<br/>            elif value != actual[key]:<br/>                mismatched.append('%s, expected: %s, actual: %s' % (key, value,actual[key]))<br/>    <br/>        if not (missing or mismatched):<br/>            return<br/>    <br/>        standardMsg = ''<br/>        if missing:<br/>            standardMsg = 'Missing: %s' % ','.join(m for m in missing)<br/>        if mismatched:<br/>            if standardMsg:<br/>                standardMsg += '; '<br/>            standardMsg += 'Mismatched values: %s' % ','.join(mismatched)<br/>    <br/>        if msg is None:<br/>            raise Exception(standardMsg)<br/>        else:<br/>            try:<br/>            # don't switch to '{}' formatting in Python 2.X<br/>            # it changes the way unicode input is handled<br/>&gt;               raise Exception('%s : %s' % (standardMsg, msg))<br/><span class="error">E               Exception: Mismatched values: fRefundMoney, expected: 10.0, actual: 0 : haha1两者不匹配1：</span><br/><br/>../../../utils/assert_extra.py:35: Exception<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_http.py::test_post[OpenResultList-{&quot;iGameId&quot;:51,&quot;sGamePeriod&quot;:20170524146}-{&quot;SQL&quot;:&quot;SELECT *, (fBonusMoney - fBetMoney  + fRewardMoney) AS fUserBalance,(fBetMoney - fBonusMoney) AS fCorpBalance FROM (SELECT * FROM ( SELECT SUM (famount) AS fBetMoney,SUM (fRewardMoney) AS fRewardMoney,SUM (fWinAmount) AS fBonusMoney FROM tbet WHERE iGameId = 51 AND sGamePeriod = 20170524146 and iStatus &lt;&gt; 2 GROUP BY sGamePeriod,iGameId) AS T1 INNER JOIN (SELECT SUM (famount) AS fRefundMoney FROM tbet WHERE iGameId = 51 AND sGamePeriod = 20170524146 AND istatus = 2) AS T2  ON 1 = 1) AS T3 RIGHT JOIN (select dOpenTime as dOpenTimeTEXT, iGameId, sGamePeriod, sOpenNum from tgameperiod where sGamePeriod=20170524146 and iGameId=51) as t5 on 1=1;&quot;}]</td>
+          <td class="col-duration">0.75</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="empty log">No log output captured.</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_http.py::test_post[OpenResultList-{&quot;iGameId&quot;:51,&quot;sGamePeriod&quot;:20170525108}-{&quot;SQL&quot;:&quot;SELECT *, isnull((fBonusMoney - fBetMoney  + fRewardMoney),0) AS fUserBalance,isnull((fBetMoney - - fBonusMoney),0) AS fCorpBalance FROM (SELECT * FROM ( SELECT isnull(SUM (famount),0) AS fBetMoney,isnull(SUM (fRewardMoney),0) AS fRewardMoney,isnull(SUM (fWinAmount),0) AS fBonusMoney FROM tbet WHERE iGameId = 51 AND sGamePeriod = 20170525108 and iStatus &lt;&gt; 2 ) AS T1 INNER JOIN (SELECT isnull(SUM (famount),0) AS fRefundMoney FROM tbet WHERE iGameId = 51 AND sGamePeriod = 20170525108 AND istatus = 2) AS T2  ON 1 = 1) AS T3 RIGHT JOIN (select dOpenTime as dOpenTimeTEXT, iGameId, sGamePeriod, sOpenNum from tgameperiod where sGamePeriod=20170525108 and iGameId=51) as t5 on 1=1;&quot;}]</td>
+          <td class="col-duration">0.86</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="empty log">No log output captured.</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_http.py::test_post[OpenResultList-{&quot;iGameId&quot;:51}-{&quot;SQL&quot;:&quot;declare @iGameid int =51 SELECT tg.*,isnull(t3.fBetMoney,0) fBetMoney,isnull(t3.fRewardMoney,0) fRewardMoney,isnull(t3.fBonusMoney,0) fBonusMoney,isnull(t3.fRefundMoney,0) fRefundMoney, isnull((fBonusMoney - fBetMoney  + fRewardMoney),0) AS fUserBalance,isnull((fBetMoney-fBonusMoney),0) AS fCorpBalance FROM (select top 20 dOpenTime as dOpenTimeTEXT,iGameId,sGamePeriod,isnull(sOpenNum,&apos;&apos;) sOpenNum from tgameperiod where iGameId=@iGameid and dStartTime &lt;GETDATE() order by dopentime desc) tg LEFT join (select t1.*,t2.fRefundMoney from (SELECT sGamePeriod,isnull(SUM(famount),0) AS fBetMoney,isnull(SUM(fRewardMoney),0) AS fRewardMoney,isnull(SUM(fWinAmount),0) AS fBonusMoney FROM tbet where iGameId=@iGameId and iStatus != 2 group by sGamePeriod) as t1 full join (SELECT sGamePeriod as sGamePeriod, isnull(SUM(famount),0) AS fRefundMoney FROM tbet where iGameId=@iGameId and istatus = 2 group by sGamePeriod) as t2 on t1.sGamePeriod=t2.sGamePeriod ) as t3 on t3.sGamePeriod=tg.sGamePeriod order by dOpenTimeTEXT desc;&quot;}]</td>
+          <td class="col-duration">2.46</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="empty log">No log output captured.</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_http.py::test_post[CanLogin-{&quot;sUserID&quot;:&quot;jtest&quot;,&quot;sPassword&quot;:&quot;d6720b4f645d96c3f7e346c39d39dc7f&quot;}-{&quot;SQL&quot;:&quot;select sUserid,sUpper,sPassword,sTransPwd,fBalance,fFtcRebate,fSscRebate,sLevel,iStatus,iAllowTrans,fWinTotal,iLoginCount-1 as iLoginCount from tuser where sUserid=&apos;jtest&apos;;&quot;}]</td>
+          <td class="col-duration">0.60</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="empty log">No log output captured.</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_http.py::test_post[CanLogin-{&quot;sUserID&quot;:&quot;jtest&quot;,&quot;sPassword&quot;:&quot;999999&quot;}-{&quot;sUserID&quot;:&quot;jtest&quot;,&quot;Func&quot;:&quot;CanLogin&quot;,&quot;Result&quot;:0,&quot;Desc&quot;:&quot;\u5e10\u53f7\u540d\u6216\u5bc6\u7801\u9519\u8bef\u3002&quot;}]</td>
+          <td class="col-duration">0.15</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="empty log">No log output captured.</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_http.py::test_post[CanLogin-{&quot;sUserID&quot;:&quot;jtestjtest&quot;,&quot;sPassword&quot;:&quot;d6720b4f645d96c3f7e346c39d39dc7f&quot;}-{&quot;sUserID&quot;:&quot;jtestjtest&quot;,&quot;Func&quot;:&quot;CanLogin&quot;,&quot;Result&quot;:0,&quot;Desc&quot;:&quot;\u7528\u6237\u540d\u6216\u5bc6\u7801\u9519\u8bef\u3002&quot;}]</td>
+          <td class="col-duration">0.14</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="empty log">No log output captured.</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_http.py::test_post[CanLogin-{&quot;sUserID&quot;:&quot;jtest&quot;}-{&quot;sUserID&quot;:&quot;jtest&quot;,&quot;Func&quot;:&quot;CanLogin&quot;,&quot;Result&quot;:0,&quot;Desc&quot;:&quot;\u5e10\u53f7\u540d\u6216\u5bc6\u7801\u9519\u8bef\u3002&quot;}]</td>
+          <td class="col-duration">0.43</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="empty log">No log output captured.</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_http.py::test_post[CanLogin-{&quot;sPassword&quot;:&quot;d6720b4f645d96c3f7e346c39d39dc7f&quot;}-{&quot;sUserID&quot;:&quot;&quot;,&quot;Func&quot;:&quot;CanLogin&quot;,&quot;Result&quot;:0,&quot;Desc&quot;:&quot;\u7528\u6237\u540d\u6216\u5bc6\u7801\u9519\u8bef\u3002&quot;}]</td>
+          <td class="col-duration">0.17</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="empty log">No log output captured.</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_http.py::test_post[CanLogin-{}-{&quot;sUserID&quot;:&quot;&quot;,&quot;Func&quot;:&quot;CanLogin&quot;,&quot;Result&quot;:0,&quot;Desc&quot;:&quot;\u7528\u6237\u540d\u6216\u5bc6\u7801\u9519\u8bef\u3002&quot;}]</td>
+          <td class="col-duration">0.19</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="empty log">No log output captured.</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_http.py::test_post[CurBalance-{&quot;iUserKey&quot;:52235}-{&quot;SQL&quot;:&quot;select iUserKey,fBalance from tuser where iUserKey=52235  ;&quot;}]</td>
+          <td class="col-duration">0.72</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="empty log">No log output captured.</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_http.py::test_post[CurBalance-{&quot;iUserKey&quot;:99999}-{&quot;iUserKey&quot;:99999,&quot;fBalance&quot;:0,&quot;Func&quot;:&quot;CurBalance&quot;,&quot;Result&quot;:1,&quot;Desc&quot;:&quot;OK&quot;}]</td>
+          <td class="col-duration">0.15</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="empty log">No log output captured.</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_http.py::test_post[CurBalance-{&quot;iUserKey&quot;:&quot;jtest&quot;}-{&quot;Func&quot;:&quot;CurBalance&quot;,&quot;Result&quot;:0,&quot;Error&quot;:1,&quot;Desc&quot;:&quot;\u7cfb\u7edf\u9519\u8bef&quot;}]</td>
+          <td class="col-duration">0.14</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="empty log">No log output captured.</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_http.py::test_post[CurBalance-{&quot;iUserKey&quot;:&quot;&quot;}-{&quot;Func&quot;:&quot;CurBalance&quot;,&quot;Result&quot;:0,&quot;Error&quot;:1,&quot;Desc&quot;:&quot;\u7cfb\u7edf\u9519\u8bef&quot;}]</td>
+          <td class="col-duration">0.14</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="empty log">No log output captured.</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_http.py::test_post[CurBalance-{}-{&quot;iUserKey&quot;:0,&quot;fBalance&quot;:0,&quot;Func&quot;:&quot;CurBalance&quot;,&quot;Result&quot;:1,&quot;Desc&quot;:&quot;OK&quot;}]</td>
+          <td class="col-duration">0.16</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="empty log">No log output captured.</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_http.py::test_post[RegDiscountInfo-{&quot;iType&quot;:1}-{&quot;SQL&quot;:&quot;select iType,fMoney,fBetNum,iGiveUp,iStatus,sRemark from TRegDiscount where iType = 1;&quot;}]</td>
+          <td class="col-duration">0.63</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="empty log">No log output captured.</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_http.py::test_post[RegDiscountInfo-{&quot;iType&quot;:2}-{&quot;SQL&quot;:&quot;select iType,fMoney,fBetNum,iGiveUp,iStatus,sRemark from TRegDiscount where iType = 2;&quot;}]</td>
+          <td class="col-duration">0.92</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="empty log">No log output captured.</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_http.py::test_post[RegDiscountInfo-{&quot;iType&quot;:5}-{&quot;Func&quot;:&quot;RegDiscountInfo&quot;,&quot;Result&quot;:0,&quot;Desc&quot;:&quot;\u7c7b\u522b\u9519\u8bef\u3002&quot;}]</td>
+          <td class="col-duration">0.14</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="empty log">No log output captured.</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_http.py::test_post[RegDiscountInfo-{&quot;iType&quot;:&quot;&quot;}-{&quot;Func&quot;:&quot;RegDiscountInfo&quot;,&quot;Result&quot;:0,&quot;Error&quot;:1,&quot;Desc&quot;:&quot;\u7cfb\u7edf\u9519\u8bef&quot;}]</td>
+          <td class="col-duration">0.13</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="empty log">No log output captured.</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_http.py::test_post[RegDiscountInfo-{}-{&quot;Func&quot;:&quot;RegDiscountInfo&quot;,&quot;Result&quot;:0,&quot;Desc&quot;:&quot;\u7c7b\u522b\u9519\u8bef\u3002&quot;}]</td>
+          <td class="col-duration">0.14</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="empty log">No log output captured.</div></td></tr></tbody></table></body></html>

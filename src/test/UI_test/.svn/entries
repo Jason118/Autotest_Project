@@ -1,0 +1,80 @@
+10
+
+dir
+7928
+svn://jason@10.10.14.119/DOC/01CP/11AutoTest/web_autotest_project/src/src/test/UI_test
+svn://jason@10.10.14.119
+
+
+
+2017-06-01T03:24:04.215055Z
+7916
+jason
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+6089f1f8-5df4-11e6-8b40-9357fc61e82b
+
+__init__.py
+file
+
+
+
+
+2017-06-01T05:15:22.000000Z
+dd3a703c87e6144d429e84b1b3619752
+2017-05-02T11:36:51.069381Z
+6506
+jason
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+18
+
+common
+dir
+
+suite
+dir
+
+testrunner
+dir
+
+case
+dir
+
+report
+dir
+
+page
+dir
+

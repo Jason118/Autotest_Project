@@ -1,0 +1,6 @@
+2017-05-24 10:03:35,576 - src.utils.mail - INFO - attach file /Users/jason/mysvn/11AutoTest/web_autotest_project/src/src/utils/../../report/web_autotest_report_20170524.html
+2017-05-24 10:03:39,732 - src.utils.mail - INFO - 发送邮件"WEB自动化测试报告_20170524"成功! 收件人：mlxyhr1@gmail.com。如果没有收到邮件，请检查垃圾箱，同时检查收件人地址是否正确
+2017-05-24 11:28:25,014 - src.utils.mail - INFO - attach file /Users/jason/mysvn/11AutoTest/web_autotest_project/src/src/utils/../../report/web_autotest_report_20170524.html
+2017-05-24 11:28:28,305 - src.utils.mail - INFO - 发送邮件"WEB自动化测试报告_20170524"成功! 收件人：mlxyhr1@gmail.com。如果没有收到邮件，请检查垃圾箱，同时检查收件人地址是否正确
+2017-05-24 11:35:13,257 - src.utils.mail - INFO - attach file /Users/jason/mysvn/11AutoTest/web_autotest_project/src/src/utils/../../report/web_autotest_report_20170524.html
+2017-05-24 11:35:16,985 - src.utils.mail - INFO - 发送邮件"WEB自动化测试报告_20170524"成功! 收件人：mlxyhr1@gmail.com。如果没有收到邮件，请检查垃圾箱，同时检查收件人地址是否正确

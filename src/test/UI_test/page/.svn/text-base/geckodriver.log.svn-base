@@ -1,0 +1,114 @@
+1493365198330	geckodriver	INFO	Listening on 127.0.0.1:63781
+1493365200378	mozprofile::profile	INFO	Using profile path C:\Users\ADMINI~1\AppData\Local\Temp\rust_mozprofile.xxOAtgFWqPL5
+1493365200379	geckodriver::marionette	INFO	Starting browser C:\Program Files\Mozilla Firefox\firefox.exe with args []
+1493365200381	geckodriver::marionette	INFO	Connecting to Marionette on localhost:63789
+1493365200813	Marionette	INFO	Listening on port 63789
+*************************
+A coding exception was thrown and uncaught in a Task.
+
+Full message: TypeError: this.browser.getBrowserForTab is not a function
+Full stack: BrowserObj.prototype.hasRemotenessChange@chrome://marionette/content/driver.js:3243:25
+BrowserObj.prototype.executeWhenReady@chrome://marionette/content/driver.js:3274:7
+GeckoDriver.prototype.sendAsync@chrome://marionette/content/driver.js:231:5
+send/proxy<@chrome://marionette/content/proxy.js:150:7
+send@chrome://marionette/content/proxy.js:111:17
+ownPriorityGetterTrap.get/<@chrome://marionette/content/proxy.js:28:25
+GeckoDriver.prototype.findElement@chrome://marionette/content/driver.js:1927:31
+TaskImpl_run@resource://gre/modules/Task.jsm:315:40
+TaskImpl@resource://gre/modules/Task.jsm:276:3
+createAsyncFunction/asyncFunction@resource://gre/modules/Task.jsm:250:14
+Task_spawn@resource://gre/modules/Task.jsm:164:12
+TaskImpl_handleResultValue@resource://gre/modules/Task.jsm:384:16
+TaskImpl_run@resource://gre/modules/Task.jsm:323:13
+TaskImpl@resource://gre/modules/Task.jsm:276:3
+createAsyncFunction/asyncFunction@resource://gre/modules/Task.jsm:250:14
+Task_spawn@resource://gre/modules/Task.jsm:164:12
+Dispatcher.prototype.execute@chrome://marionette/content/dispatcher.js:120:13
+Dispatcher.prototype.onPacket@chrome://marionette/content/dispatcher.js:91:5
+DebuggerTransport.prototype._onJSONObjectReady/<@chrome://marionette/content/server.js -> resource://devtools/shared/transport/transport.js:479:9
+exports.makeInfallible/<@resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/shared/ThreadSafeDevToolsUtils.js:101:14
+exports.makeInfallible/<@resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/shared/ThreadSafeDevToolsUtils.js:101:14
+Spinner.prototype.observe@resource://gre/modules/AsyncShutdown.jsm:529:9
+
+*************************
+*************************
+A coding exception was thrown and uncaught in a Task.
+
+Full message: TypeError: this.browser.getBrowserForTab is not a function
+Full stack: BrowserObj.prototype.hasRemotenessChange@chrome://marionette/content/driver.js:3243:25
+BrowserObj.prototype.executeWhenReady@chrome://marionette/content/driver.js:3274:7
+GeckoDriver.prototype.sendAsync@chrome://marionette/content/driver.js:231:5
+send/proxy<@chrome://marionette/content/proxy.js:150:7
+send@chrome://marionette/content/proxy.js:111:17
+ownPriorityGetterTrap.get/<@chrome://marionette/content/proxy.js:28:25
+GeckoDriver.prototype.findElement@chrome://marionette/content/driver.js:1927:31
+TaskImpl_run@resource://gre/modules/Task.jsm:315:40
+TaskImpl@resource://gre/modules/Task.jsm:276:3
+createAsyncFunction/asyncFunction@resource://gre/modules/Task.jsm:250:14
+Task_spawn@resource://gre/modules/Task.jsm:164:12
+TaskImpl_handleResultValue@resource://gre/modules/Task.jsm:384:16
+TaskImpl_run@resource://gre/modules/Task.jsm:323:13
+TaskImpl@resource://gre/modules/Task.jsm:276:3
+createAsyncFunction/asyncFunction@resource://gre/modules/Task.jsm:250:14
+Task_spawn@resource://gre/modules/Task.jsm:164:12
+Dispatcher.prototype.execute@chrome://marionette/content/dispatcher.js:120:13
+Dispatcher.prototype.onPacket@chrome://marionette/content/dispatcher.js:91:5
+DebuggerTransport.prototype._onJSONObjectReady/<@chrome://marionette/content/server.js -> resource://devtools/shared/transport/transport.js:479:9
+exports.makeInfallible/<@resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/shared/ThreadSafeDevToolsUtils.js:101:14
+exports.makeInfallible/<@resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/shared/ThreadSafeDevToolsUtils.js:101:14
+Spinner.prototype.observe@resource://gre/modules/AsyncShutdown.jsm:529:9
+
+*************************
+*************************
+A coding exception was thrown in a Promise rejection callback.
+See https://developer.mozilla.org/Mozilla/JavaScript_code_modules/Promise.jsm/Promise
+
+Full message: TypeError: this.browser.getBrowserForTab is not a function
+Full stack: BrowserObj.prototype.hasRemotenessChange@chrome://marionette/content/driver.js:3243:25
+BrowserObj.prototype.executeWhenReady@chrome://marionette/content/driver.js:3274:7
+GeckoDriver.prototype.sendAsync@chrome://marionette/content/driver.js:231:5
+send/proxy<@chrome://marionette/content/proxy.js:150:7
+send@chrome://marionette/content/proxy.js:111:17
+ownPriorityGetterTrap.get/<@chrome://marionette/content/proxy.js:28:25
+GeckoDriver.prototype.findElement@chrome://marionette/content/driver.js:1927:31
+TaskImpl_run@resource://gre/modules/Task.jsm:315:40
+TaskImpl@resource://gre/modules/Task.jsm:276:3
+createAsyncFunction/asyncFunction@resource://gre/modules/Task.jsm:250:14
+Task_spawn@resource://gre/modules/Task.jsm:164:12
+TaskImpl_handleResultValue@resource://gre/modules/Task.jsm:384:16
+TaskImpl_run@resource://gre/modules/Task.jsm:323:13
+TaskImpl@resource://gre/modules/Task.jsm:276:3
+createAsyncFunction/asyncFunction@resource://gre/modules/Task.jsm:250:14
+Task_spawn@resource://gre/modules/Task.jsm:164:12
+Dispatcher.prototype.execute@chrome://marionette/content/dispatcher.js:120:13
+Dispatcher.prototype.onPacket@chrome://marionette/content/dispatcher.js:91:5
+DebuggerTransport.prototype._onJSONObjectReady/<@chrome://marionette/content/server.js -> resource://devtools/shared/transport/transport.js:479:9
+exports.makeInfallible/<@resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/shared/ThreadSafeDevToolsUtils.js:101:14
+exports.makeInfallible/<@resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/shared/ThreadSafeDevToolsUtils.js:101:14
+Spinner.prototype.observe@resource://gre/modules/AsyncShutdown.jsm:529:9
+
+*************************
+Marionette threw an error: TypeError: this.browser.getBrowserForTab is not a function
+BrowserObj.prototype.hasRemotenessChange@chrome://marionette/content/driver.js:3243:25
+BrowserObj.prototype.executeWhenReady@chrome://marionette/content/driver.js:3274:7
+GeckoDriver.prototype.sendAsync@chrome://marionette/content/driver.js:231:5
+send/proxy<@chrome://marionette/content/proxy.js:150:7
+send@chrome://marionette/content/proxy.js:111:17
+ownPriorityGetterTrap.get/<@chrome://marionette/content/proxy.js:28:25
+GeckoDriver.prototype.findElement@chrome://marionette/content/driver.js:1927:31
+TaskImpl_run@resource://gre/modules/Task.jsm:315:40
+TaskImpl@resource://gre/modules/Task.jsm:276:3
+createAsyncFunction/asyncFunction@resource://gre/modules/Task.jsm:250:14
+Task_spawn@resource://gre/modules/Task.jsm:164:12
+TaskImpl_handleResultValue@resource://gre/modules/Task.jsm:384:16
+TaskImpl_run@resource://gre/modules/Task.jsm:323:13
+TaskImpl@resource://gre/modules/Task.jsm:276:3
+createAsyncFunction/asyncFunction@resource://gre/modules/Task.jsm:250:14
+Task_spawn@resource://gre/modules/Task.jsm:164:12
+Dispatcher.prototype.execute@chrome://marionette/content/dispatcher.js:120:13
+Dispatcher.prototype.onPacket@chrome://marionette/content/dispatcher.js:91:5
+DebuggerTransport.prototype._onJSONObjectReady/<@chrome://marionette/content/server.js -> resource://devtools/shared/transport/transport.js:479:9
+exports.makeInfallible/<@resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/shared/ThreadSafeDevToolsUtils.js:101:14
+exports.makeInfallible/<@resource://gre/modules/commonjs/toolkit/loader.js -> resource://devtools/shared/ThreadSafeDevToolsUtils.js:101:14
+Spinner.prototype.observe@resource://gre/modules/AsyncShutdown.jsm:529:9
+

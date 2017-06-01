@@ -1,0 +1,24 @@
+<html>
+<body>
+<div id="A">
+    <!--父节点定位子节点-->
+    <div id="B">
+        <div>parent to child</div>
+    </div>
+    <!--子节点定位父节点-->
+    <div>
+        <div>child to parent
+            <div>
+                <div id="C"></div>
+            </div>
+        </div>
+    </div>
+    <!--下面两个节点用于兄弟节点定位-->
+    <div>brother 1</div>
+    <div id="D"></div>
+    <div>brother 2</div>
+</div>
+<div id="target4" class="target"></div>
+
+</body>
+</html>

@@ -1,0 +1,9 @@
+1491298146999	geckodriver	INFO	Listening on 127.0.0.1:9926
+1491298149035	mozprofile::profile	INFO	Using profile path C:\Users\ADMINI~1\AppData\Local\Temp\rust_mozprofile.jkMNgEVckN72
+1491298149037	geckodriver::marionette	INFO	Starting browser C:\Program Files\Mozilla Firefox\firefox.exe with args []
+1491298149040	geckodriver::marionette	INFO	Connecting to Marionette on localhost:9932
+1491298149403	Marionette	INFO	Listening on port 9932
+JavaScript warning: https://gss0.bdstatic.com/7051cy792sgCpNKfpU_Y_D3/static/common/pkg/more_fc10a72.js, line 1: mutating the [[Prototype]] of an object will cause your code to run very slowly; instead create the object with the correct initial [[Prototype]] value using Object.create
+JavaScript warning: https://passport.baidu.com/static/passpc-base/js/dv/3.min.js, line 1: unreachable code after return statement
+JavaScript warning: https://passport.baidu.com/static/passpc-base/js/dv/3.min.js, line 1: unreachable code after return statement
+JavaScript warning: https://passport.baidu.com/static/passpc-base/js/dv/3.min.js line 1 > eval, line 1: unreachable code after return statement

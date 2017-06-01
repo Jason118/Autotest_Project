@@ -1,0 +1,40 @@
+# 这个yaml文件用来说明测试用例文件的格式规定
+# 写用例文件必须按照此规定
+
+---  # 用此来分隔接口，一个接口对应一个
+- config:
+    testset: 测试组名称
+    url: http://test.url.com
+    headers: {Content-Type: application/json}
+
+- classsetup:
+    name: AddUser
+    url_con: adduser
+    method: POST
+    body : '{"username": "xx", "password": "password", "mobile": "13322222222"}'
+
+
+- classteardown:
+    name: xx
+
+- setup:
+    name: xx
+
+- teardown:
+    name: xx
+
+- test:
+    name: CheckCode
+    url: http://test.url.com/checkcode
+    method: POST
+    datafile: check.xlsx
+    sheet: CheckCode
+    iteration: [3, 10]
+    body: '{"name": "XX Corp.", "id": "1234567"}'
+    headers: {Content-Type: application/json}
+    expected_code:  [200, 301] # 传入一个值或者列表，返回的status_code在这个列表中算成功，否则失败
+    extract_binds:  # 传入一个字典，key是返回值中需要用到的值的key，value是引用名，后面用例中用到此参数时用 $引用名 的形式
+        - id: {'response':}
+    validators:  # 检查点
+        - text: 'str'  # 文本检查点，验证返回值中有字符串'str'
+        - compare: {}
