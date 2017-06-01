@@ -2,8 +2,8 @@
 #coding:utf-8
 
 #Created on 2017年3月23日
-from test.UI_test.page.GcdtPage import GcdtPage
-from test.UI_test.page.RegistPage import RegistPage
+from src.test.UI_test.page.GcdtPage import GcdtPage
+from src.test.UI_test.page.RegistPage import RegistPage
 
 __author__ = 'Jason'
 

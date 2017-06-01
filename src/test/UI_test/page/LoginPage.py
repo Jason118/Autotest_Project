@@ -3,8 +3,8 @@
 # @Time    : 2017/5/26 9:20
 # @Author  : Terry
 import time
-from test.UI_test.page.BasePage import BasePage
-from utils.config import DefaultConfig_Project
+from src.test.UI_test.page.BasePage import BasePage
+from src.utils.config import DefaultConfig_Project
 
 
 class LoginPage(BasePage):

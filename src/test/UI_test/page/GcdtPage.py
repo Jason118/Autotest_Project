@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2017/5/25 9:58
 # @Author  : Terry
-from test.UI_test.page.BasePage import BasePage
-from utils.config import DefaultConfig_Project
+from src.test.UI_test.page.BasePage import BasePage
+from src.utils.config import DefaultConfig_Project
 import time
 
 

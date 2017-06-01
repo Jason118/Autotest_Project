@@ -1426,7 +1426,7 @@ sUrl_web="http://lotf.jwoquxoc.com/"
 
 
 # conn = pyodbc.connect("DRIVER={SQL Server};CHARSET=UTF8;SERVER=119.9.124.151,3344;PORT=1433;DATABASE=CAT01;UID=Lottery01;PWD=adjIUEd8&D817dpA")   #600vip
-conn = pymssql.connect(server='119.9.124.151', port='3344', user='Lottery01', password='adjIUEd8&D817dpA', database='CAT01', charset='UTF8' )
+#conn = pymssql.connect(server='119.9.124.151', port='3344', user='Lottery01', password='adjIUEd8&D817dpA', database='CAT01', charset='UTF8' )
 
 # sql_list=["select * from trebateset ;","select * from tbank ;"]
 # 

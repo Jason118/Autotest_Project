@@ -5,7 +5,7 @@ import time
 # from src.test.API_test.common.BaseCaseOperate import BaseCaseOperate
 from src.test.UI_test.page.HomePage import HomePage
 # from src.utils import ReadXML
-from HTMLTestRunner import HTMLTestRunner
+from src.utils.reporter.HTMLTestRunner import HTMLTestRunner
 from src.utils.filereader.excel_reader import ExcelReader
 from src.utils.getdb import db_mysql_connect,db_sql_dict,unicode_dict
 

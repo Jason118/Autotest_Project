@@ -3,9 +3,9 @@
 # @Time    : 2017/5/27 9:55
 # @Author  : Terry
 import time
-from test.UI_test.page.BasePage import BasePage
-from test.UI_test.page.LoginPage import LoginPage
-from utils.config import DefaultConfig_Project
+from src.test.UI_test.page.BasePage import BasePage
+from src.test.UI_test.page.LoginPage import LoginPage
+from src.utils.config import DefaultConfig_Project
 
 
 class RegistPage(BasePage):
